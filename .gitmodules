@@ -1,3 +1,6 @@
 [submodule "TestTokenContract/lib/forge-std"]
 	path = TestTokenContract/lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
+[submodule "TestTokenContract/lib/openzeppelin-contracts"]
+	path = TestTokenContract/lib/openzeppelin-contracts
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts
