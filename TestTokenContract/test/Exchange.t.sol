@@ -65,6 +65,16 @@ contract ExchangeTest is Test {
         assertEq(eth, ethAmount);
     }
 
+    function test_setRate() public {
+        // Revert if rate of 0 is set
+        vm.expectRevert("Exchange: Rate must be non-zero and new");
+        exchange.setRate(0);
+        // Revert if rate is set by non-owner
+        vm.expectRevert("Ownable: caller is not the owner");
+        vm.prank(alex);
+        exchange.setRate(3);
+    }
+
     ///@notice Ensures all authorized functions are only callable by appropriate caller
     function test_ownershipTransferAuth() public {
         // Alex cannot transfer ownership
@@ -94,4 +104,24 @@ contract ExchangeTest is Test {
         // But registered minter can
         localTestToken.burn(bob, 1000 ether);
     }
+
+    function test_directEthTransfer() public {
+        vm.prank(alex);
+        //Send ETH directly, hits receive()
+        vm.expectRevert();
+        (bool success,) = address(exchange).call{value: 2 ether}("");
+        require(success);
+    }
+
+
+     function test_directCall() public {
+         vm.prank(alex);
+         // Calls func directly, hits fallback()
+         vm.expectRevert();
+         (bool success,) = address(exchange).call{value: 2 ether}(
+             abi.encodeWithSignature("joeMama()")
+         );
+         require(success);
+
+     }
 }

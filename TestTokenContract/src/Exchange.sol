@@ -25,16 +25,8 @@ contract Exchange is Ownable, ReentrancyGuard {
         // Deploy the TestToken and store the instance address
         testToken = new TestToken();
         // Ensure the supplied rate is greater than 0
-        require(_rate > 0, "TestVault: Rate must be greater than zero");
+        require(_rate > 0, "Exchange: Rate must be greater than zero");
         rate = _rate;
-    }
-
-    function tokensForEth(uint256 ethAmount) public view returns (uint256) {
-        return ethAmount * rate;
-    }
-
-    function ethForTokens(uint256 tokenAmount) public view returns (uint256) {
-        return tokenAmount / rate;
     }
 
     /**
@@ -42,11 +34,11 @@ contract Exchange is Ownable, ReentrancyGuard {
      */
     function buyTokens() external payable nonReentrant returns (uint256) {
         // Ensure ETH sent is not 0
-        require(msg.value > 0, "TestVault: Insufficient ETH provided");
+        require(msg.value > 0, "Exchange: Insufficient ETH provided");
         // Calculate tokenAmount as per given ETH and the rate
         uint256 tokenAmount = msg.value * rate;
         // Ensure calculated tokenAmount is not 0
-        require(tokenAmount > 0, "TestVault: Invalid token amount");
+        require(tokenAmount > 0, "Exchange: Invalid token amount");
         // Mint tokens
         testToken.mint(address(this), tokenAmount);
         // Transfer minted tokens to user
@@ -64,15 +56,15 @@ contract Exchange is Ownable, ReentrancyGuard {
         uint256 amount
     ) external nonReentrant returns (uint256) {
         // Ensure amount being sold is not 0
-        require(amount > 0, "TestVault: Invalid token amount");
+        require(amount > 0, "Exchange: Invalid token amount");
         // Calculate ETH amount to return to seller
         uint256 ethAmount = amount / rate;
         // Ensure calculated eth amount is not 0
-        require(ethAmount > 0, "TestVault: Insufficient token amount");
+        require(ethAmount > 0, "Exchange: Insufficient token amount");
         // Ensure seller has enough balance to sell the given amount of tokens
         require(
             testToken.balanceOf(msg.sender) >= amount,
-            "TestVault: Insufficient token balance"
+            "Exchange: Insufficient token balance"
         );
         // Transfer tokens being sold from seller to this contract
         IERC20(testToken).safeTransferFrom(msg.sender, address(this), amount);
@@ -80,7 +72,7 @@ contract Exchange is Ownable, ReentrancyGuard {
         testToken.burn(address(this), amount);
         // Transfer commensurate ETH amount to the caller/ seller
         (bool success, ) = payable(msg.sender).call{value: ethAmount}("");
-        require(success, "TestVault: Failed to send ETH to seller");
+        require(success, "Exchange: Failed to send ETH to seller");
 
         emit TokensSold(msg.sender, amount, ethAmount);
 
@@ -96,7 +88,7 @@ contract Exchange is Ownable, ReentrancyGuard {
         // Ensure new rate is not 0 and is not the same as current rate
         require(
             newRate > 0 && newRate != previousRate,
-            "TestVault: Rate must be non-zero and new"
+            "Exchange: Rate must be non-zero and new"
         );
         // Set new rate
         rate = newRate;
@@ -109,10 +101,10 @@ contract Exchange is Ownable, ReentrancyGuard {
      */
 
     fallback() external payable {
-        revert("TestVault: No direct calls");
+        revert();
     }
 
     receive() external payable {
-        revert("TestVault: No direct deposits");
+        revert();
     }
 }
