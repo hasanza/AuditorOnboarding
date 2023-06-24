@@ -28,8 +28,8 @@ contract TestToken is ERC20 {
         _burn(tokenOwner, amount);
     }
 
-    function checkMinter(address _possibleMinter) external view returns (bool) {
-        return _registeredMinters[_possibleMinter];
+    function checkMinter(address _minter) external view returns (bool) {
+        return _registeredMinters[_minter];
     }
 
 }
