@@ -36,7 +36,7 @@ contract ExchangeTest is Test {
     }
 
     ///@notice Buy tokens, then sell them back; ensure we receive same amount we paid for the tokens
-    function test_sellTokens() public {
+    function test_buyAndSellTokens() public {
         uint256 ethPaid = 23 ether;
         vm.startPrank(alex);
 
@@ -82,5 +82,16 @@ contract ExchangeTest is Test {
         localTestToken.mint(bob, 1000 ether);
         // But registered minter can
         localTestToken.mint(bob, 1000 ether);
+    }
+
+    function test_burnAuth() public {
+        // Mint tokens
+        localTestToken.mint(bob, 1000 ether);
+        // Unregistered caller cannot mint TestTokens
+        vm.prank(alex);
+        vm.expectRevert("TestToken: Unreg minter");
+        localTestToken.burn(bob, 1000 ether);
+        // But registered minter can
+        localTestToken.burn(bob, 1000 ether);
     }
 }
