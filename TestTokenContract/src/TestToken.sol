@@ -1,15 +1,19 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.0;
 
 import "openzeppelin-contracts/token/ERC20/ERC20.sol";
-import "openzeppelin-contracts/token/ERC20/extensions/ERC20Burnable.sol";
 
-contract TestToken is ERC20, ERC20Burnable {
+contract TestToken is ERC20 {
     // Mapping of registered minters
     mapping(address => bool) internal _registeredMinters;
-    constructor() ERC20("TestToken", "TTK") {
+    constructor() ERC20("TEST", "TEST") {
         // Add deployer to list of registered minters
         _registeredMinters[msg.sender] = true;
+    }
+
+    modifier onlyMinter() {
+        require(_registeredMinters[msg.sender], "TestToken: Unreg minter");
+        _;
     }
 
     function mint(address to, uint256 amount) public onlyMinter {
@@ -18,15 +22,6 @@ contract TestToken is ERC20, ERC20Burnable {
 
     function burn(address tokenOwner, uint256 amount) public onlyMinter {
         _burn(tokenOwner, amount);
-    }
-
-    modifier onlyMinter() {
-        _onlyMinter();
-        _;
-    }
-
-    function _onlyMinter() internal view {
-        require(_registeredMinters[msg.sender], "TestToken: Unreg minter");
     }
 
     function checkMinter(address _possibleMinter) external view returns (bool) {
