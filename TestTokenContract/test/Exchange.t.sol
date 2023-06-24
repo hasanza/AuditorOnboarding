@@ -59,7 +59,7 @@ contract ExchangeTest is Test {
         // Buy tokens
         uint256 tokens = exchange.buyTokens{value: ethAmount}();
         // Sell tokens
-        ERC20(exchange.testToken()).approve(address(exchange), tokens);
+        exchange.testToken().approve(address(exchange), tokens);
         uint256 eth = exchange.sellTokens(tokens);
 
         assertEq(eth, ethAmount);

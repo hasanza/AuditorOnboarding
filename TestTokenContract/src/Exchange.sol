@@ -6,10 +6,9 @@ import "openzeppelin-contracts/token/ERC20/utils/SafeERC20.sol";
 import "openzeppelin-contracts/security/ReentrancyGuard.sol";
 import "openzeppelin-contracts/access/Ownable.sol";
 
-
 contract Exchange is Ownable, ReentrancyGuard {
     // Using OZ's safeERC20 to handle transfer return values, among other stuff
-    using SafeERC20 for TestToken;
+    using SafeERC20 for IERC20;
     // To store TestToken instance address
     TestToken public testToken;
     // Defines how much ETH (in Wei) is required to be deposited for 1 TTK
@@ -30,10 +29,10 @@ contract Exchange is Ownable, ReentrancyGuard {
         rate = _rate;
     }
 
-
     function tokensForEth(uint256 ethAmount) public view returns (uint256) {
         return ethAmount * rate;
     }
+
     function ethForTokens(uint256 tokenAmount) public view returns (uint256) {
         return tokenAmount / rate;
     }
@@ -42,28 +41,43 @@ contract Exchange is Ownable, ReentrancyGuard {
     @notice Function to buy TestTokens in exchange for ETH, as per the rate.
      */
     function buyTokens() external payable nonReentrant returns (uint256) {
+        // Ensure ETH sent is not 0
         require(msg.value > 0, "TestVault: Insufficient ETH provided");
+        // Calculate tokenAmount as per given ETH and the rate
         uint256 tokenAmount = msg.value * rate;
+        // Ensure calculated tokenAmount is not 0
         require(tokenAmount > 0, "TestVault: Invalid token amount");
-        // Mint TestTokens to caller 
-        testToken.mint(msg.sender, tokenAmount);
+        // Mint tokens
+        testToken.mint(address(this), tokenAmount);
+        // Transfer minted tokens to user
+        IERC20(testToken).safeTransfer(msg.sender, tokenAmount);
+
         emit TokensPurchased(msg.sender, tokenAmount, msg.value);
         // Return bought TestToken amount
         return tokenAmount;
     }
 
-    function sellTokens(uint256 amount) external nonReentrant returns (uint256) {
+    /**
+    @notice Function to sell TestTokens for ETH
+     */
+    function sellTokens(
+        uint256 amount
+    ) external nonReentrant returns (uint256) {
+        // Ensure amount being sold is not 0
         require(amount > 0, "TestVault: Invalid token amount");
-        // ETH amount to return to seller; Tokens/ rate
+        // Calculate ETH amount to return to seller
         uint256 ethAmount = amount / rate;
+        // Ensure calculated eth amount is not 0
         require(ethAmount > 0, "TestVault: Insufficient token amount");
-
-        require(testToken.balanceOf(msg.sender) >= amount, "TestVault: Insufficient token balance");
-        // Transfer tokens being sold from seller to this contract  
-        testToken.safeTransferFrom(msg.sender, address(this), amount);
+        // Ensure seller has enough balance to sell the given amount of tokens
+        require(
+            testToken.balanceOf(msg.sender) >= amount,
+            "TestVault: Insufficient token balance"
+        );
+        // Transfer tokens being sold from seller to this contract
+        IERC20(testToken).safeTransferFrom(msg.sender, address(this), amount);
         // Burn the tokens sold
         testToken.burn(address(this), amount);
-
         // Transfer commensurate ETH amount to the caller/ seller
         (bool success, ) = payable(msg.sender).call{value: ethAmount}("");
         require(success, "TestVault: Failed to send ETH to seller");
@@ -73,14 +87,26 @@ contract Exchange is Ownable, ReentrancyGuard {
         return (ethAmount);
     }
 
+    /**
+    @notice Function to set the rate
+     */
     function setRate(uint256 newRate) external onlyOwner {
-        require(newRate > 0, "TestVault: Rate must be greater than zero");
-
+        // Cache previous rate for event emission
         uint256 previousRate = rate;
+        // Ensure new rate is not 0 and is not the same as current rate
+        require(
+            newRate > 0 && newRate != previousRate,
+            "TestVault: Rate must be non-zero and new"
+        );
+        // Set new rate
         rate = newRate;
 
         emit RateSet(previousRate, newRate);
     }
+
+    /**
+    Functions to disallow direct ETH transfers/ calls
+     */
 
     fallback() external payable {
         revert("TestVault: No direct calls");

@@ -12,8 +12,12 @@ contract TestToken is ERC20 {
     }
 
     modifier onlyMinter() {
-        require(_registeredMinters[msg.sender], "TestToken: Unreg minter");
+        _onlyMinter();
         _;
+    }
+
+    function _onlyMinter() internal view {
+        require(_registeredMinters[msg.sender], "TestToken: Unreg minter");
     }
 
     function mint(address to, uint256 amount) public onlyMinter {
