@@ -85,6 +85,26 @@ contract ExchangeTest is Test {
         exchange.transferOwnership(bob);
     }
 
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+    function test_ownershipTransferAuthEvent() public {
+        vm.expectEmit();
+        emit OwnershipTransferred(address(this), alex);
+        exchange.transferOwnership(alex);
+    }
+
+
+    event RateSet(uint256 indexed previousRate, uint256 indexed newRate);
+    function test_setRateEvent() public {
+
+        uint256 prevRate = exchange.rate();
+        uint256 newRate = 5;
+
+        vm.expectEmit();
+        emit RateSet(prevRate, newRate);
+        exchange.setRate(newRate);
+    }
+
+
     function test_mintAuth() public {
         // Unregistered caller cannot mint TestTokens
         vm.prank(alex);
@@ -122,6 +142,6 @@ contract ExchangeTest is Test {
              abi.encodeWithSignature("joeMama()")
          );
          require(success);
-
      }
+
 }

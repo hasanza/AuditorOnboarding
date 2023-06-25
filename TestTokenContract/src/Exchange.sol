@@ -82,7 +82,7 @@ contract Exchange is Ownable, ReentrancyGuard {
     /**
     @notice Function to set the rate
      */
-    function setRate(uint256 newRate) external onlyOwner {
+    function setRate(uint256 newRate) external onlyOwner returns (uint256) {
         // Cache previous rate for event emission
         uint256 previousRate = rate;
         // Ensure new rate is not 0 and is not the same as current rate
@@ -94,6 +94,8 @@ contract Exchange is Ownable, ReentrancyGuard {
         rate = newRate;
 
         emit RateSet(previousRate, newRate);
+
+        return newRate;
     }
 
     /**
