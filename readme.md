@@ -2,7 +2,7 @@
 
 Going through the onboarding task list.
 
-## [TASK1] Create TestToken exchange contract.
+## [TASK1] Create TestToken exchange contract
 
    1. Exchange's **constructor** sets the exchange rate, sets itself as registered minter and sets deployer as owner.
    2. Exchange.**buyToken()** accepts ETH, calculates token amount (ETH*rate), mints tokens, sends tokens to buyer.
