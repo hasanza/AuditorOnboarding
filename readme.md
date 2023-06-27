@@ -18,7 +18,7 @@ Going through the onboarding task list.
 
 ### Could you have used immutable variables or constants in your contract? If so, where?
 
-Perhaps if the `rate` were fixed; in that case I would have used a immutable variable.
+Perhaps if the `rate` were fixed; in that case I would have used an immutable variable.
 
 ### How much storage space does the string “Hello” consume?
 
