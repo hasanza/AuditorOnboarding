@@ -14,7 +14,7 @@ Going through the onboarding task list.
       2. That if a user buys tokens for ETH, then sells them back, he should get the original amount of ETH back.
       3. That calls revert if unauthorized calls are made to restricted functions.
 
-## [TASK2] Answer questions regarding given reading
+## [TASK2] Answer questions regarding given reading ✅
 
 ### Could you have used immutable variables or constants in your contract? If so, where?
 
@@ -46,13 +46,14 @@ Running
 
 in the directory outputs the storage layout:
 
-![4ac198699bfb8570ec3afbd2ed96f2f1.png](file:///Users/hasanraza/.config/joplin-desktop/resources/d7b3fcdeff494daebe85634bd3d54698.png)
+![image](https://github.com/hasanza/AuditorOnboarding/assets/49759922/01b01ab7-c6bf-403b-924c-e7ea365e4f81)
+
 
 ### Can you use the .push() function for uint arrays in memory? If yes, what is the estimated gas cost? If not, why not?
 
 The `push()` method does **not** exist on fixed-sze memory arrays. The documentation states that only dynamic storage arrays and `bytes` (alias for `byte[]` and can store arbitrary length byte data) have this member.
 
-![78d2c94f32c32ef13e1dcbf564552a16.png](file:///Users/hasanraza/.config/joplin-desktop/resources/6044f666aef04911a0107f467d1aa175.png)
+![image](https://github.com/hasanza/AuditorOnboarding/assets/49759922/e762ba23-61b9-414a-ad45-78eb4017a22d)
 
 The error states that: `Member "push" is not available in uint256[] memory outside of storage`.
 
