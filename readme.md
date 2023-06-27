@@ -70,3 +70,5 @@ Both are different in the following regards:
 - In addition, a `constant`'s value is fixed at compile time and the code is replaced with the expression assigned to it is copied everywhere the variable is mentioned in the compiled code. On the other hand, an `immutable` can be assigned value at declaration or in the `constructor`, but it cannot be read during construction.
     
 - More over, no matter the size of an `immutable`, 32 bytes are reserved for it.
+
+## [TASK 3] Learn about known/common issues 🏁
